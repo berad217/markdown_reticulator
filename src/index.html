@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Markdown Converter</title>
+    <!-- Set theme BEFORE stylesheets load so the first paint is correct.
+         Falls back to prefers-color-scheme when no choice is stored. -->
+    <script>
+      (function () {
+        var theme = 'light';
+        try {
+          var stored = localStorage.getItem('markdown-reticulator.theme');
+          if (stored === 'light' || stored === 'dark') {
+            theme = stored;
+          } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            theme = 'dark';
+          }
+        } catch (_) {
+          // localStorage may throw in sandboxed previews; defaults are fine.
+          if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            theme = 'dark';
+          }
+        }
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
+    <link rel="stylesheet" href="styles/app.css">
+    <link rel="stylesheet" href="styles/rendered.css">
+    <link rel="stylesheet" href="styles/themes.css">
+    <link rel="stylesheet" href="vendor/highlight-themes.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button
+                id="themeToggle"
+                class="theme-toggle"
+                type="button"
+                aria-label="Toggle light/dark theme"
+                title="Toggle light/dark theme">🌙</button>
+            <h1 id="mainTitle">📝 The Markdown Whisperer</h1>
+            <p id="mainSubtitle">Because explaining asterisks to your spouse is harder than quantum physics</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Input: file drop zone -->
+            <div class="drop-zone" id="dropZone">
+                <div class="drop-icon">📁</div>
+                <h3 id="dropZoneHeading">Drop your markdown file here and all your dreams will come true</h3>
+                <p id="dropZoneSubtext">Or click to browse for a .md file (like a civilized person)<br>
+                   <small>Supports all standard markdown syntax (and bad jokes)</small></p>
+                <!-- Hidden file input for click functionality -->
+                <input type="file" class="file-input" id="fileInput" accept=".md,.markdown,.txt">
+            </div>
+
+            <!-- Input: paste markdown text -->
+            <div class="paste-section">
+                <button class="paste-toggle" id="pasteToggle" type="button">
+                    <span class="paste-toggle-icon">📋</span>
+                    <span id="pasteToggleLabel">Or paste markdown text</span>
+                </button>
+                <div class="paste-panel" id="pastePanel" hidden>
+                    <textarea
+                        id="pasteTextarea"
+                        class="paste-textarea"
+                        placeholder="Paste your markdown here..."
+                        spellcheck="false"
+                        rows="8"></textarea>
+                    <div class="paste-actions">
+                        <button class="btn btn-secondary" id="pasteCancelBtn" type="button">Cancel</button>
+                        <button class="btn btn-primary" id="pasteRenderBtn" type="button">Render</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right side: Rendered output -->
+            <div class="output-container">
+                <div class="output-header">
+                    <div class="output-title">Rendered Document</div>
+                    <div class="action-buttons">
+                        <button class="btn btn-clear" id="clearBtn" style="display: none;">🗑️ Hasta la vista, baby</button>
+                        <button class="btn btn-secondary" id="viewToggleBtn" style="display: none;">📝 View source</button>
+                        <button class="btn btn-secondary" id="printBtn" style="display: none;">🖨️ Print / PDF</button>
+                        <button class="btn btn-secondary" id="copyBtn" style="display: none;">📋 Beam me up, Scotty</button>
+                        <button class="btn btn-primary" id="saveBtn" style="display: none;">💾 Save Ferris</button>
+                    </div>
+                </div>
+
+                <div id="output">
+                    <div style="text-align: center; padding: 60px 20px; color: #a0aec0;">
+                        <div style="font-size: 3em; margin-bottom: 20px;">✨</div>
+                        <p id="emptyStateMessage">Reticulating splines... (just kidding, drop a file)</p>
+                        <p style="font-size: 0.9em; margin-top: 10px;">Ready to make your markdown human-readable!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="vendor/marked.min.js"></script>
+    <script src="vendor/dompurify.min.js"></script>
+    <script src="vendor/highlight.min.js"></script>
+    <script src="js/references.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

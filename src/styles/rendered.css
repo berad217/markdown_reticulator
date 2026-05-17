@@ -1,0 +1,88 @@
+/* Rendered markdown styling - make it look like a real document */
+.rendered-content {
+    line-height: 1.7;
+    color: #2d3748;
+}
+
+.rendered-content h1 {
+    font-size: 2.2em;
+    margin: 30px 0 20px 0;
+    color: #1a202c;
+    border-bottom: 3px solid #667eea;
+    padding-bottom: 10px;
+}
+
+.rendered-content h2 {
+    font-size: 1.8em;
+    margin: 25px 0 15px 0;
+    color: #2d3748;
+}
+
+.rendered-content h3 {
+    font-size: 1.4em;
+    margin: 20px 0 10px 0;
+    color: #4a5568;
+}
+
+.rendered-content p {
+    margin: 15px 0;
+}
+
+.rendered-content ul, .rendered-content ol {
+    margin: 15px 0;
+    padding-left: 30px;
+}
+
+.rendered-content li {
+    margin: 8px 0;
+}
+
+.rendered-content code {
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Monaco', 'Consolas', monospace;
+    color: #e53e3e;
+}
+
+/* Code-block container. The highlight.js theme (highlight-github.css) supplies
+   the inner background and text colors via .hljs on the <code> element. */
+.rendered-content pre {
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 20px 0;
+}
+
+.rendered-content pre code {
+    display: block;
+    overflow-x: auto;
+    font-family: 'Monaco', 'Consolas', monospace;
+    font-size: 0.9em;
+    line-height: 1.5;
+}
+
+.rendered-content blockquote {
+    border-left: 4px solid #667eea;
+    padding-left: 20px;
+    margin: 20px 0;
+    font-style: italic;
+    color: #4a5568;
+}
+
+.rendered-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+.rendered-content th,
+.rendered-content td {
+    border: 1px solid #e2e8f0;
+    padding: 12px;
+    text-align: left;
+}
+
+.rendered-content th {
+    background: #f7fafc;
+    font-weight: 600;
+}
