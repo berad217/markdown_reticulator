@@ -2,9 +2,9 @@
 
 easy markdown viewer and converter for normies.
 
-[![Download](https://img.shields.io/badge/⬇%20download-markdown--reticulator.html-2962ff?style=for-the-badge)](https://github.com/berad217/markdown_reticulator/blob/main/dist/markdown-reticulator.html)
+[![Download](https://img.shields.io/badge/⬇%20download-markdown--reticulator.html-2962ff?style=for-the-badge)](https://github.com/berad217/markdown_reticulator/releases/latest/download/markdown-reticulator.html)
 
-Click the button → on the file page that opens, click **Download raw file** (top right). Save the `.html` anywhere and double-click to open. That's it — no install, no internet required.
+One click downloads the file. Save it anywhere and double-click to open in your browser. No install, no internet required.
 
 ## What it's for
 
