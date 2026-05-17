@@ -1,6 +1,6 @@
 # markdown_reticulator
 
-easy markdown viewer and converter for normies.
+easy markdown viewer and converter for normies.  It reticulates all the splines!
 
 [![Download](https://img.shields.io/badge/⬇%20download-markdown--reticulator.html-2962ff?style=for-the-badge)](https://github.com/berad217/markdown_reticulator/releases/latest/download/markdown-reticulator.html)
 
