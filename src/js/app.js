@@ -14,6 +14,7 @@ const pasteToggleLabel = document.getElementById('pasteToggleLabel');
 const themeToggle = document.getElementById('themeToggle');
 const viewToggleBtn = document.getElementById('viewToggleBtn');
 const printBtn = document.getElementById('printBtn');
+const saveMdBtn = document.getElementById('saveMdBtn');
 
 // Store the processed HTML and original markdown for export and source-view.
 let processedHTML = '';
@@ -107,6 +108,7 @@ function renderMarkdown(markdownText, displayName) {
         clearBtn.style.display = 'block';
         viewToggleBtn.style.display = 'block';
         printBtn.style.display = 'block';
+        saveMdBtn.style.display = 'block';
     } catch (error) {
         showStatus(getRandomReference('errorMessages') + ': ' + error.message, 'error');
         console.error('Render error:', error);
@@ -367,6 +369,28 @@ copyBtn.addEventListener('click', async () => {
     }
 });
 
+// Save the original markdown source as a .md file. Useful when the source came
+// from paste-input and the user wants the .md on disk for later — e.g. they
+// copied markdown out of a tool that doesn't let them export a .md directly.
+saveMdBtn.addEventListener('click', () => {
+    try {
+        const blob = new Blob([originalMarkdown], { type: 'text/markdown;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${originalFileName || 'markdown'}.md`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        showStatus('Markdown file downloaded!', 'success');
+    } catch (error) {
+        showStatus(`Save .md failed: ${error.message}`, 'error');
+        console.error('Save .md error:', error);
+    }
+});
+
 // Save as HTML file
 saveBtn.addEventListener('click', () => {
     try {
@@ -498,6 +522,7 @@ clearBtn.addEventListener('click', () => {
     hidePastePanel();
     viewToggleBtn.style.display = 'none';
     printBtn.style.display = 'none';
+    saveMdBtn.style.display = 'none';
     document.title = DEFAULT_TITLE;
 
     output.innerHTML = `
