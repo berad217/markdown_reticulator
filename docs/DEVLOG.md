@@ -86,3 +86,38 @@ Agreed on a three-sprint plan (see `spec.md`). Decided to move from one file to 
 - Run the manual checklist above and triage any failures.
 - Sprint 4 candidate: KaTeX math (with one of the three font-handling options decided).
 - Sprint 4 candidate: the export HTML's hardcoded styles (`createCompleteHTMLDocument`) currently ignore the app theme. Could be parameterized by current theme so dark-theme users get dark exports.
+
+---
+
+## 2026-05-17 — Small features, first GitHub release, and onboarding
+
+Day after the big push. Polish round triggered by real-world usage.
+
+### What shipped
+
+- **Paste-input filename derivation.** Previously, every paste-then-save produced `pasted-markdown.html`, easy to overwrite. Now `renderMarkdown()` derives the display name from the document's first ATX H1 (slugified, capped at 60 chars), falling back to a timestamp `pasted-YYYY-MM-DD-HHMM.md`. File-drop behavior unchanged.
+- **Copy button rewrite.** The old `navigator.clipboard.writeText(html)` call routinely failed silently, with the catch handler swallowing the real error and showing a ridiculous-reference meme instead. Replaced with `navigator.clipboard.write([new ClipboardItem({...})])` carrying both `text/html` (formatted for Gmail/Word/Slack paste) and `text/plain` (markdown source for code editors). Fallback to `writeText`. Real error messages now surface to the user.
+- **Print → Save as PDF, properly.** Print stylesheet now sets `@page { margin: 0.75in }`, page-break-inside avoidance for code/tables/quotes/images, page-break-after avoidance after headings, orphans/widows balancing, and `print-color-adjust: exact` so syntax-highlight colors survive into PDF. Print handler temporarily flips `data-theme="light"` for the duration of the dialog (auto-restores via `afterprint`) so dark-theme users get an ink-friendly PDF without manually switching. Button relabeled `🖨️ Print / PDF`.
+- **Document title syncs to loaded file** so the print dialog suggests the right PDF filename. `DEFAULT_TITLE` captured at boot and restored on clear.
+- **Save .md button.** New stable-labeled button between Copy and Save. Downloads `originalMarkdown` as a `.md` file using the same filename derivation as the HTML save. Use case: user copies markdown out of a tool that doesn't expose a `.md` export (NotebookLM, etc.) and wants to view + save as a real `.md` in one app.
+- **Ridiculous-references tweak.** "Self-destruct sequence initiated" → "This message will self destruct (if you press)". Funnier.
+- **README rewrite for humans.** Replaced the original two-liner with a real GitHub-facing README: shields.io download button, what it's for, what it does, how to use, safety note, developer pointer at `src/` + `build.py`, credits.
+- **v1.0.0 GitHub release.** First release with `dist/markdown-reticulator.html` as a downloadable asset. README badge now points at `/releases/latest/download/...` for a true 1-click download that auto-redirects to whatever the latest release is. Web UI flow (no `gh` CLI in this env).
+- **onboarding.md created** at project root via the `human-training:workflow-orientation` skill's audit. Closes the only canonical-doc gap.
+
+### Decisions worth remembering
+
+- **Single-file delivery is non-negotiable.** Considered adding a JS PDF library (jsPDF, html2pdf) for one-click PDF without the print dialog. Rejected: ~250–300 KB for what `window.print()` already does well, plus html2canvas-based libraries rasterize, which the user explicitly didn't want. Improving the print stylesheet was the right answer.
+- **Stable labels for format-mattering buttons.** Save .md, Print / PDF kept literal labels; Save (HTML) and Copy kept their randomized labels. Ridiculous references live where personality > clarity.
+- **`/releases/latest/download/` URL pattern.** README links to this evergreen URL instead of pinning to a specific tag, so future releases don't require a README edit. Worth remembering when the asset filename ever changes (don't change it).
+- **No `gh` CLI in this Claude Code environment.** GitHub MCP connector is bound to claude.ai surfaces, not Code. Future GitHub actions go through web UI or the user does them.
+
+### Bundle size
+
+- After all of today's changes: ~233.9 KB (was 228 KB yesterday). Still well under any meaningful threshold.
+
+### Still ahead
+
+- Math (KaTeX) still deferred. Hasn't bit anyone yet.
+- Theme-aware HTML export (so dark-theme users get dark exports). Not painful today.
+- Real-world feedback from sharing the download link with a friend or two.
