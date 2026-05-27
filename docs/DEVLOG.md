@@ -121,3 +121,45 @@ Day after the big push. Polish round triggered by real-world usage.
 - Math (KaTeX) still deferred. Hasn't bit anyone yet.
 - Theme-aware HTML export (so dark-theme users get dark exports). Not painful today.
 - Real-world feedback from sharing the download link with a friend or two.
+
+---
+
+## 2026-05-26 — Mermaid support (decision reversal)
+
+Brad started getting Mermaid diagrams in his actual day-to-day markdown (AI tool outputs, mostly) within days of declaring Mermaid out-of-scope. Reversed the decision. Good signal — real-world usage beats prior speculation.
+
+### What shipped
+
+- **Mermaid v11 vendored** into `src/vendor/mermaid.min.js` (~3.3 MB). The build pulls it in like any other vendor file; `globalThis.mermaid` is exposed at the end of the IIFE so the rest of the app just references `mermaid.run()` directly.
+- **`applyMermaidDiagrams()`** runs in `displayRenderedContent()` *before* `applySyntaxHighlighting()`. It walks `pre code.language-mermaid` blocks, replaces each `<pre>` with a `<div class="mermaid">` carrying the source on both `textContent` and `data-mermaid-source`, then calls `mermaid.run({ nodes })`. The dataset attribute is preserved so we can re-render.
+- **`initializeMermaid()`** sets the Mermaid theme to `dark` or `default` based on the current `data-theme`, and pins `securityLevel: 'strict'` so user-supplied diagram source can't inject HTML.
+- **`rerenderMermaidForTheme()`** wired into the theme toggle. On click: clear `data-processed`, restore source from the dataset attribute, re-init with the new theme, re-run. Diagram content stays identical; only colors change.
+- **CSS** in `rendered.css`: centered diagrams, `overflow-x: auto` for wide ones, `svg { max-width: 100% }` so they shrink to the container.
+- **Fixture** at `tests/fixtures/with-mermaid.md` covers flowchart + sequence + an intentionally broken diagram (verifies that one bad block doesn't crash the page).
+- **TEST-PLAN.md** gained T-2.5 (Mermaid renders) and T-2.6 (re-themes on toggle).
+
+### Decisions and tradeoffs
+
+- **Bundle size grew from 234 KB to 3.48 MB.** 15× growth in one feature. Considered:
+  - **Lazy-load from CDN** when a `mermaid` block is detected — rejected because it breaks the offline guarantee that's a hard constraint, and creates "sometimes works" reliability bugs when the CDN is blocked.
+  - **Two-file delivery** with `mermaid.min.js` as a sibling — rejected, defeats the single-file purpose.
+  - **Vendor full** — accepted. 3.5 MB is still trivially emailable and parses in ~100 ms locally. The single-file constraint is core.
+- **`securityLevel: 'strict'`** chosen over `'antiscript'` / `'loose'`. Mermaid will strip user-controlled HTML from labels. Less expressive but safer for arbitrary markdown.
+- **Mermaid runs before highlight.js** to avoid having highlight.js try to colorize Mermaid source (it would either pick a wrong language or no-op, but cleanest to remove `<pre><code>` entirely first).
+- **Source stored on data attribute** for theme re-render. Considered re-parsing the markdown source on every theme toggle but that wastes work; storing per-diagram is cheap and clean.
+
+### Worth remembering
+
+- Decision reversals are healthy when usage data beats speculation. The "Mermaid out of scope" line in spec.md lived for 9 days before reality killed it.
+- When you flip a hard-constraint decision, update spec, onboarding, and DEVLOG together. Spec.md now has a Sprint 4 section with this work; onboarding's hard-constraints list dropped the Mermaid bullet and added a note about the reversal.
+
+### Bundle size after this push
+
+- 3.48 MB total. Mermaid is 95% of it.
+- Future feature additions should be weighed against this baseline. Anything that adds another MB needs a real-world signal as strong as Brad's "I keep getting Mermaid diagrams now."
+
+### Still ahead
+
+- Cut v1.1.0 GitHub release with the new dist asset so the README download link delivers Mermaid-capable file.
+- Smoke-test against `tests/fixtures/with-mermaid.md`.
+- Consider: does it ever make sense to ship a "lite" build without Mermaid for users who don't need it? Probably not — single-file delivery means one artifact. Don't fork.

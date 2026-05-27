@@ -67,9 +67,10 @@ Sprint-based, lightweight. Brad uses the global lifecycle workflow from his `~/.
 
 1. **The deliverable stays a single HTML file.** That's the entire point of the project. The build script exists to preserve this while letting source live in proper files.
 2. **No CDN dependencies in the built file.** Vendor anything new. The whole app must work offline.
-3. **Anything that renders user-supplied content runs through DOMPurify.** XSS sanitization is non-negotiable. The `markdownToSafeHTML()` helper is the only sanctioned path.
-4. **Mermaid is out of scope.** ~1 MB for a feature rare in normie markdown.
-5. **Automated tests stay out** unless something gets gnarly enough to genuinely demand them.
+3. **Anything that renders user-supplied content runs through DOMPurify.** XSS sanitization is non-negotiable. The `markdownToSafeHTML()` helper is the only sanctioned path. Mermaid additionally uses `securityLevel: 'strict'` for diagram-source sanitization.
+4. **Automated tests stay out** unless something gets gnarly enough to genuinely demand them.
+
+**Recently revised:** Mermaid was previously listed as out-of-scope. Reversed 2026-05-26 after Brad started seeing Mermaid blocks in real-world docs. Now vendored (~3.3 MB) and supported.
 
 ---
 

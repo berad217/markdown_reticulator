@@ -40,9 +40,12 @@ The original `markdown-converter.html` was a single ~790-line file. This sprint 
 3. **[deferred]** Math (KaTeX). The JS would inline cleanly (~280 KB), but KaTeX needs ~200 KB of WOFF2 font files that don't fit the single-file constraint without base64-bloat or a CDN dependency. Math is uncommon in normie markdown, so this gets deferred until we either (a) commit to the size and inline the fonts as data URIs, or (b) accept a CDN dependency just for math.
 4. **[done]** Print button — `window.print()` with a print stylesheet that strips the chrome and the TOC.
 
-**Out of scope (decided 2026-05-16):**
-- **Mermaid diagrams.** Too heavy (~1 MB) for how rare they are in normie markdown. May revisit later as a lazy-loaded CDN fetch.
-- **Automated tests.** UI tool small enough that manual testing per sprint is more honest than green-checkmark theatre. Manual test checklist lives in `docs/DEVLOG.md` per sprint.
+### Sprint 4 — Real-world feedback features  (in progress)
+
+1. **[done] Mermaid diagrams.** Reversed earlier "out of scope" decision after Brad started getting Mermaid blocks in his actual day-to-day markdown (2026-05-17 / 2026-05-26). Vendored `mermaid@11` (~3.3 MB) into the bundle. New `applyMermaidDiagrams()` runs before highlight.js, converts `pre code.language-mermaid` blocks to `div.mermaid`, and calls `mermaid.run()` with `securityLevel: 'strict'`. Theme tracks `data-theme`; diagrams re-render on theme toggle by restoring source from `data-mermaid-source`.
+
+**Out of scope:**
+- **Automated tests.** UI tool small enough that manual testing per sprint is more honest than green-checkmark theatre. Manual test checklist lives in `tests/TEST-PLAN.md`.
 
 **Done when:** opening a real-world markdown doc feels at least as good as viewing it on GitHub. ← We're there for everything except math.
 
@@ -59,17 +62,19 @@ src/
 │   ├── references.js   the ridiculous reference table
 │   └── app.js          main logic (single file for now — split if it grows)
 └── vendor/             third-party libs, vendored for offline use
-    ├── marked.min.js              v15.0.12
-    ├── dompurify.min.js           3.4.3
-    ├── highlight.min.js           11.9.0 common bundle
+    ├── marked.min.js              v15.0.12      (~40 KB)
+    ├── dompurify.min.js           3.4.3         (~25 KB)
+    ├── highlight.min.js           11.9.0 common (~120 KB)
+    ├── mermaid.min.js             v11           (~3.3 MB)
     ├── highlight-github.css       source for theme combiner
     ├── highlight-github-dark.css  source for theme combiner
     └── highlight-themes.css       generated; both themes scoped by [data-theme]
 
 build.py                            bundles src/ → dist/markdown-reticulator.html
 scripts/generate-highlight-themes.py  regenerates highlight-themes.css
-dist/                               committed build artifact (~228 KB)
+dist/                               committed build artifact (~3.5 MB)
 docs/                               spec.md, DEVLOG.md
+tests/                              TEST-PLAN.md, fixtures/, reports
 ```
 
 ## Non-goals

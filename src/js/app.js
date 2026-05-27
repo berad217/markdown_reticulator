@@ -146,9 +146,70 @@ function displayRenderedContent(htmlContent, fileName) {
     rendered.innerHTML = htmlContent;
     output.appendChild(rendered);
 
+    applyMermaidDiagrams(rendered);
     applySyntaxHighlighting(rendered);
     warnIfRelativeImages(rendered);
     buildTableOfContents(rendered);
+}
+
+// Convert ```mermaid code blocks into rendered diagrams. Runs before
+// applySyntaxHighlighting so highlight.js doesn't try to colorize the source.
+// Each diagram's original source is stashed on data-mermaid-source so we can
+// re-render with new colors when the user toggles the theme.
+function applyMermaidDiagrams(container) {
+    if (typeof mermaid === 'undefined') return;
+    const blocks = container.querySelectorAll('pre code.language-mermaid');
+    if (!blocks.length) return;
+
+    blocks.forEach((block) => {
+        const source = block.textContent;
+        const wrapper = document.createElement('div');
+        wrapper.className = 'mermaid';
+        wrapper.dataset.mermaidSource = source;
+        wrapper.textContent = source;
+        const pre = block.parentElement;
+        if (pre && pre.parentElement) {
+            pre.parentElement.replaceChild(wrapper, pre);
+        }
+    });
+
+    initializeMermaid();
+    mermaid
+        .run({ nodes: container.querySelectorAll('.mermaid') })
+        .catch((err) => { console.error('Mermaid render error:', err); });
+}
+
+function initializeMermaid() {
+    if (typeof mermaid === 'undefined') return;
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark'
+        ? 'dark'
+        : 'default';
+    mermaid.initialize({
+        startOnLoad: false,
+        theme,
+        securityLevel: 'strict',
+        fontFamily: 'inherit'
+    });
+}
+
+// Re-render existing diagrams when the theme changes so their colors match
+// the page. Mermaid marks rendered nodes with data-processed; we clear that
+// and reset the inner text to the saved source before re-running.
+function rerenderMermaidForTheme() {
+    if (typeof mermaid === 'undefined') return;
+    const diagrams = document.querySelectorAll('.mermaid[data-mermaid-source]');
+    if (!diagrams.length) return;
+
+    diagrams.forEach((div) => {
+        div.removeAttribute('data-processed');
+        div.innerHTML = '';
+        div.textContent = div.dataset.mermaidSource;
+    });
+
+    initializeMermaid();
+    mermaid
+        .run({ nodes: diagrams })
+        .catch((err) => { console.error('Mermaid re-render error:', err); });
 }
 
 // Highlight every <pre><code> block inside a container using highlight.js.
@@ -622,6 +683,7 @@ themeToggle.addEventListener('click', () => {
     } catch (_) {
         // Persistence is best-effort.
     }
+    rerenderMermaidForTheme();
 });
 
 // Apply theme immediately so first paint is correct.

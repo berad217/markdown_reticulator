@@ -86,3 +86,15 @@
     background: #f7fafc;
     font-weight: 600;
 }
+
+/* Mermaid diagram container — centered with horizontal scroll for wide diagrams */
+.rendered-content .mermaid {
+    text-align: center;
+    margin: 24px 0;
+    overflow-x: auto;
+}
+
+.rendered-content .mermaid svg {
+    max-width: 100%;
+    height: auto;
+}

@@ -25,6 +25,7 @@ All fixtures live in `tests/fixtures/`. Use the file picker (click the drop zone
 | `with-local-images.md`           | T-2.4                               |
 | `with-many-headings.md`          | T-3.1, T-3.2                        |
 | `with-few-headings.md`           | T-3.3                               |
+| `with-mermaid.md`                | T-2.5, T-2.6                        |
 | `kitchen-sink.md`                | T-5.1, T-6.2                        |
 
 ## Browser-automation notes
@@ -130,6 +131,30 @@ All fixtures live in `tests/fixtures/`. Use the file picker (click the drop zone
 **Expected:**
 - The theme you picked is still active after reload.
 - Open DevTools → Application → Local Storage → file://. There should be a key `markdown-reticulator.theme` with value `light` or `dark` matching your choice.
+
+### T-2.5 — Mermaid diagrams render
+
+**Steps:**
+1. Click 🗑️ (clear).
+2. Load `tests/fixtures/with-mermaid.md`.
+
+**Expected:**
+- The flowchart renders as an actual SVG diagram (not as raw text or a code block).
+- The sequence diagram renders as an actual SVG diagram.
+- The intentionally broken diagram displays a visible Mermaid error message in place of the diagram. The page does NOT crash.
+- The rest of the document (including the "After the broken diagram" paragraph) renders normally.
+- DevTools Console may show one Mermaid error from the broken diagram — expected. No other errors.
+
+### T-2.6 — Mermaid diagrams re-theme on toggle
+
+**Steps:**
+1. With `with-mermaid.md` still loaded, note the current diagram colors.
+2. Click the 🌙 / ☀️ theme toggle.
+
+**Expected:**
+- The diagrams re-render to match the new theme (light → dark gives diagrams a dark background; dark → light gives them a light background).
+- The diagram content (boxes, arrows, labels) is the same — only colors change.
+- Toggling back restores the original colors.
 
 ### T-2.4 — Relative-image warning appears
 
