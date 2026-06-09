@@ -208,7 +208,11 @@ That's why combine was nearly free: set the globals to the merged markdown and e
 
 - 3490.3 KB, essentially unchanged from the 3.48 MB Mermaid baseline — the new JS/CSS is noise next to Mermaid (and the toggle removal shaved a hair off).
 
+### Released as v1.2.0 (2026-06-09)
+
+- Shipped as **v1.2.0**, now the latest GitHub release. Asset is the combined Mermaid + multi-file build, so the README's evergreen `/releases/latest/download/` link delivers it.
+- **Record correction:** v1.1.0 was *not* uncut. It shipped Mermaid on 2026-05-27 ("The Mermaid Cometh (We Were Wrong)"), and the README "latest" link had been serving the Mermaid build ever since. The "cut v1.1.0 release" note in the 2026-05-26 Mermaid entry — and the first draft of this entry — were stale and wrong. Don't trust those lines. (The gap that actually remained was just multi-file, now closed by v1.2.0.)
+
 ### Still ahead
 
-- v1.1.0 release is *still* uncut (predates this work) — the README's "latest" download link still serves the pre-Mermaid v1.0.0 file. Cutting it now would ship both Mermaid **and** multi-file in one release.
 - Possible polish: drag-to-reorder; persist the loaded set across reloads; a per-file "Save .md" from the row.
