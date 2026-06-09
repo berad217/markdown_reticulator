@@ -27,6 +27,7 @@ All fixtures live in `tests/fixtures/`. Use the file picker (click the drop zone
 | `with-few-headings.md`           | T-3.3                               |
 | `with-mermaid.md`                | T-2.5, T-2.6                        |
 | `kitchen-sink.md`                | T-5.1, T-6.2                        |
+| `folder-set/` (3 numbered files) | T-7.1 – T-7.6                       |
 
 ## Browser-automation notes
 
@@ -355,6 +356,85 @@ All fixtures live in `tests/fixtures/`. Use the file picker (click the drop zone
 - Code block has a dark background with bright syntax colors.
 - The blue info banner (if any) is readable on dark.
 - Take a screenshot of the full rendered view in dark mode for the report.
+
+---
+
+# T-7 — Multi-file load, sidebar, and combine
+
+These cover the multi-file feature: dropping several files (or a folder), the
+sidebar file list, per-file viewing, reordering, removal, and combining into one
+document. The sidebar only appears once at least one file is loaded.
+
+### T-7.1 — Load multiple files at once
+
+**Steps:**
+1. Click 🗑️ (clear) if anything is loaded.
+2. Click the drop zone. In the file picker, multi-select all three files in
+   `tests/fixtures/folder-set/` (`01-intro.md`, `02-usage.md`, `03-appendix.md`).
+   (Or drag the whole `folder-set` folder onto the drop zone.)
+
+**Expected:**
+- The layout becomes two columns: a sidebar on the left, the rendered document on the right.
+- The sidebar shows a "3 FILES" header and a list of all three files.
+- Files are listed in alphabetical (numeric-aware) order: `01-intro.md`, `02-usage.md`, `03-appendix.md` — regardless of the order they were selected.
+- The first file (`01-intro.md`) renders automatically and its row is highlighted as active.
+- A "🧩 Combine 3 files" button appears, enabled.
+- No console errors.
+
+### T-7.2 — Click a file to view it
+
+**Steps:**
+1. With the three files loaded, click `03-appendix.md` in the sidebar.
+
+**Expected:**
+- The right pane switches to render `03-appendix.md` (heading "Appendix", a Mermaid diagram renders).
+- The `03-appendix.md` row is now highlighted; the previously active row is not.
+- The document title (browser tab) updates to `03-appendix`.
+
+### T-7.3 — Reorder with up/down
+
+**Steps:**
+1. Click the ↓ (down) arrow on the `01-intro.md` row.
+
+**Expected:**
+- The list order becomes `02-usage.md`, `01-intro.md`, `03-appendix.md`.
+- The ↑ arrow on the top row and the ↓ arrow on the bottom row are disabled (greyed out).
+
+### T-7.4 — Combine into one document
+
+**Steps:**
+1. Ensure all three checkboxes are checked.
+2. Click "🧩 Combine 3 files".
+
+**Expected:**
+- The right pane renders all three files as one document, in the **current sidebar order**.
+- Each file is introduced by an H1 of its filename (e.g. "02-usage") followed by the file's own content, with a horizontal rule (`---`) between files.
+- A single "On this page" TOC spans all three files' headings.
+- The Mermaid diagram (from the appendix) and the highlighted Python code block (from usage) both render correctly inside the combined document.
+- The two "Notes" headings (usage + appendix) get distinct anchor IDs (`#notes`, `#notes-2`).
+- The Combine button appears in an active/pressed state; no single file row is highlighted.
+- The browser tab title is `combined`.
+
+### T-7.5 — Combine respects the checkboxes
+
+**Steps:**
+1. Uncheck `02-usage.md`.
+2. Click the Combine button (now "🧩 Combine 2 files").
+
+**Expected:**
+- The combined document contains only the checked files (intro + appendix), not usage.
+- Unchecking until fewer than 2 files are checked disables the Combine button.
+- "Select all" / "Select none" link toggles every checkbox.
+
+### T-7.6 — Remove a file, and combined export
+
+**Steps:**
+1. Click the ✕ on one file's row.
+2. With a combined view showing, click "📄 Save .md" and "💾 Save" (HTML).
+
+**Expected:**
+- Removing a file drops it from the list. If it was the one being viewed, a neighboring file is shown instead. Removing the last file returns to the empty state (single column, sidebar gone).
+- The saved `.md` and `.html` files contain the **combined** content (named `combined.md` / `combined.html`), confirming exports operate on whatever is currently rendered.
 
 ---
 

@@ -43,36 +43,44 @@
             <p id="mainSubtitle">Because explaining asterisks to your spouse is harder than quantum physics</p>
         </div>
 
-        <div class="main-content">
+        <div class="main-content" id="mainContent">
+          <!-- Left side: inputs + loaded-file list -->
+          <div class="sidebar">
             <!-- Input: file drop zone -->
             <div class="drop-zone" id="dropZone">
                 <div class="drop-icon">📁</div>
-                <h3 id="dropZoneHeading">Drop your markdown file here and all your dreams will come true</h3>
-                <p id="dropZoneSubtext">Or click to browse for a .md file (like a civilized person)<br>
-                   <small>Supports all standard markdown syntax (and bad jokes)</small></p>
-                <!-- Hidden file input for click functionality -->
-                <input type="file" class="file-input" id="fileInput" accept=".md,.markdown,.txt">
+                <h3 id="dropZoneHeading">Drop your markdown files here and all your dreams will come true</h3>
+                <p id="dropZoneSubtext">Or click to browse for .md files (like a civilized person)<br>
+                   <small>Drop one file, several, or a whole folder</small></p>
+                <!-- Hidden file input for click functionality (multiple = pick several) -->
+                <input type="file" class="file-input" id="fileInput" accept=".md,.markdown,.txt" multiple>
             </div>
 
-            <!-- Input: paste markdown text -->
+            <!-- Input: paste markdown text. Always visible (thin) so pasting
+                 needs no extra click; drag a corner to grow it. -->
             <div class="paste-section">
-                <button class="paste-toggle" id="pasteToggle" type="button">
-                    <span class="paste-toggle-icon">📋</span>
-                    <span id="pasteToggleLabel">Or paste markdown text</span>
-                </button>
-                <div class="paste-panel" id="pastePanel" hidden>
-                    <textarea
-                        id="pasteTextarea"
-                        class="paste-textarea"
-                        placeholder="Paste your markdown here..."
-                        spellcheck="false"
-                        rows="8"></textarea>
-                    <div class="paste-actions">
-                        <button class="btn btn-secondary" id="pasteCancelBtn" type="button">Cancel</button>
-                        <button class="btn btn-primary" id="pasteRenderBtn" type="button">Render</button>
-                    </div>
+                <label class="paste-label" for="pasteTextarea">📋 Or paste markdown text</label>
+                <textarea
+                    id="pasteTextarea"
+                    class="paste-textarea"
+                    placeholder="Paste markdown here, then Render (or press Ctrl/Cmd+Enter)..."
+                    spellcheck="false"
+                    rows="3"></textarea>
+                <div class="paste-actions">
+                    <button class="btn btn-primary" id="pasteRenderBtn" type="button">Render</button>
                 </div>
             </div>
+
+            <!-- Loaded files: list + combine. Hidden until at least one file. -->
+            <div class="file-panel" id="filePanel" hidden>
+                <div class="file-panel-header">
+                    <span class="file-panel-title" id="filePanelTitle">Files</span>
+                    <button class="file-panel-link" id="selectAllBtn" type="button">Select all</button>
+                </div>
+                <ul class="file-list" id="fileList"></ul>
+                <button class="btn btn-primary combine-btn" id="combineBtn" type="button">🧩 Combine selected</button>
+            </div>
+          </div>
 
             <!-- Right side: Rendered output -->
             <div class="output-container">

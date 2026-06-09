@@ -163,3 +163,52 @@ Brad started getting Mermaid diagrams in his actual day-to-day markdown (AI tool
 - Cut v1.1.0 GitHub release with the new dist asset so the README download link delivers Mermaid-capable file.
 - Smoke-test against `tests/fixtures/with-mermaid.md`.
 - Consider: does it ever make sense to ship a "lite" build without Mermaid for users who don't need it? Probably not — single-file delivery means one artifact. Don't fork.
+
+---
+
+## 2026-06-09 — Multi-file sidebar: load many, view individually, combine into one
+
+Brad hit a real workflow: a folder of markdown files he wanted to read without the drop-one / clear / drop-next dance, plus the occasional need to merge several into a single document and reorder them. Implemented as one unified feature.
+
+### Design
+
+The whole app was built around four globals representing exactly one document (`processedHTML`, `originalMarkdown`, `originalFileName`, `viewMode`). That coupling turned out to be shallow — every consumer (Copy, Save .md, Save HTML, Print, View source, TOC, Mermaid re-theme) just reads those globals. So instead of rewriting the pipeline, I added a **document collection layer on top**: `documents[]` is the source of truth, and the globals now mean "whatever is currently rendered" — a single selected file or the combined view. The key lever:
+
+> The combined document is just another `renderMarkdown(joinedText, name)` call.
+
+That's why combine was nearly free: set the globals to the merged markdown and every export button, the TOC, Mermaid, and the source toggle keep working with zero changes.
+
+### What shipped
+
+- **Multi-file + folder load.** Drop several files or a whole folder onto the drop zone; the click-to-browse input gained `multiple`. Folder drops use `webkitGetAsEntry()` + a directory reader (batched `readEntries` loop). **Flat by design** — top-level files plus one level into a dropped directory, no subfolder recursion (Brad's call; avoids tree-walking edge cases). Non-markdown files are skipped with a count in the status banner. Newly added files are sorted alphabetically (numeric-aware, so `01-`, `02-`, … land in order).
+- **Sidebar.** New left column (`.sidebar`) holding the compact drop zone, the paste toggle, and the loaded-file list. Each row: a combine checkbox, the filename (click to view), ↑/↓ reorder buttons (disabled at the ends), and a ✕ remove. Active file is highlighted. Empty state stays single-column; `.main-content.has-docs` flips to two columns and collapses back to a stack under 768px.
+- **Combine.** "Combine N files" merges the checked files **in current sidebar order**. Annotated join: each file gets an H1 of its filename and a `---` rule between files, so the unified TOC sections by file (Brad's chosen format). Reordering re-renders the combined view live. Needs ≥2 checked; button disables otherwise.
+- **Paste unified.** Pasted text now becomes a document in the list like any dropped file, instead of a separate one-off path.
+- **Clear reworked** into a reusable `resetToEmpty()` that drops the whole collection, hides the panel, and removes the two-column layout. Removing files one-by-one falls back to a neighbor, or to the empty state when the last one goes.
+
+### Decisions worth remembering
+
+- **Flat folder reads, not recursive.** Covers "drag my folder of notes in" without the ordering/huge-tree problems of deep recursion. Revisit only if a real nested-folder case shows up.
+- **Annotated combine (filename H1 + `---`), even when a file already has its own H1.** Produces a predictable per-file TOC section. Accepts an occasional "double title" (injected filename H1 followed by the doc's own H1) as the cost of predictability. Verified the TOC slug de-dupe already handles cross-file heading collisions (`notes`, `notes-2`).
+- **Reorder = up/down buttons, not drag.** Robust, accessible, no dependency, works day one. Drag-to-reorder is possible later as polish, still with no new vendor lib.
+- **No new vendor deps.** Folder traversal and reorder are native APIs — the single-file / offline constraints are untouched.
+
+### Verification (real browser, via Playwright over a local HTTP server)
+
+`file://` was blocked by the automation, so served the dist over `python -m http.server` and drove the **built artifact**. Exercised: multi-file load + alphabetical sort (uploaded out of order, landed sorted), click-to-view, reorder reflected in combine, combine (injected H1s + 2 `<hr>`s, Mermaid SVG present, `hljs` highlighting present, 11-entry unified TOC, deduped `notes`/`notes-2`), and clear back to empty. Added `tests/fixtures/folder-set/` (three numbered files: a plain doc, one with a Python code block, one with a Mermaid diagram + a deliberately duplicated "Notes" heading) and T-7.1–T-7.6 to the TEST-PLAN.
+
+- **Bug caught by the browser test:** `combinedView` was used throughout but never declared (`let` was missing). Threw `ReferenceError` on first file load. Pure static syntax-checking (`node --check`) passed — only running it surfaced this. Fixed; re-verified clean (no console errors beyond a favicon 404).
+
+### Follow-on UX tweaks (same session)
+
+- **Paste area always present.** The paste textarea used to hide behind an "Or paste markdown text" toggle. Now it's a thin (~3-row), always-visible box below the drop zone with a Render button — pasting needs no expand click. Removed the toggle button, the show/hide panel logic, and the redundant Cancel button (there's no panel to cancel now); the textarea clears itself after a successful render and can still be dragged taller.
+- **Drop text says files/folders.** The visible drop-zone text comes from the randomized `references.js` arrays plus a hardcoded `<small>` line in `initializeRidiculousness()`, *not* the static HTML (the static text is overwritten at boot). Pluralized the singular-"file" joke references and changed the stable line to "Drop one file, several, or a whole folder" so the multi-file/folder capability is always communicated.
+
+### Bundle size
+
+- 3490.3 KB, essentially unchanged from the 3.48 MB Mermaid baseline — the new JS/CSS is noise next to Mermaid (and the toggle removal shaved a hair off).
+
+### Still ahead
+
+- v1.1.0 release is *still* uncut (predates this work) — the README's "latest" download link still serves the pre-Mermaid v1.0.0 file. Cutting it now would ship both Mermaid **and** multi-file in one release.
+- Possible polish: drag-to-reorder; persist the loaded set across reloads; a per-file "Save .md" from the row.

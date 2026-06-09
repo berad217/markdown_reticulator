@@ -73,6 +73,34 @@ body {
     min-height: 600px;
 }
 
+/* Sidebar holds the inputs and the loaded-file list. Empty state = a single
+   stacked column (sidebar above output). Once files are loaded, .has-docs
+   flips the layout to two columns: a fixed-width sidebar and a flexible output. */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+}
+
+.main-content.has-docs {
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+.main-content.has-docs .sidebar {
+    width: 280px;
+    flex-shrink: 0;
+}
+
+.main-content.has-docs .drop-zone { margin: 30px 0 12px 30px; }
+.main-content.has-docs .paste-section { margin: 0 0 12px 30px; }
+.main-content.has-docs .file-panel { margin: 0 0 30px 30px; }
+
+.main-content.has-docs .output-container {
+    flex: 1;
+    min-width: 0; /* let the column shrink instead of overflowing on long lines */
+    margin: 30px 30px 30px 24px;
+}
+
 /* Drop zone styling - compact and efficient */
 .drop-zone {
     border: 3px dashed #cbd5e0;
@@ -151,47 +179,24 @@ body {
     margin: 0 30px 20px 30px;
 }
 
-.paste-toggle {
-    background: none;
-    border: none;
+.paste-label {
+    display: block;
     color: #667eea;
-    font-size: 0.95em;
+    font-size: 0.9em;
     font-weight: 500;
-    cursor: pointer;
-    padding: 6px 10px;
-    border-radius: 6px;
-    transition: background 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.paste-toggle:hover {
-    background: #edf2f7;
-}
-
-.paste-toggle-icon {
-    font-size: 1.1em;
-}
-
-.paste-panel {
-    margin-top: 10px;
-    padding: 15px;
-    background: #f7fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
+    margin-bottom: 6px;
 }
 
 .paste-textarea {
     width: 100%;
-    padding: 12px;
+    padding: 10px 12px;
     border: 1px solid #cbd5e0;
     border-radius: 6px;
     font-family: 'Monaco', 'Consolas', monospace;
     font-size: 0.9em;
     line-height: 1.5;
     resize: vertical;
-    min-height: 150px;
+    min-height: 52px;
     color: #2d3748;
     background: white;
 }
@@ -206,7 +211,149 @@ body {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
-    margin-top: 12px;
+    margin-top: 8px;
+}
+
+/* Loaded-file list (sidebar) */
+.file-panel {
+    margin: 0 30px 20px 30px;
+    padding: 10px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+
+.file-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    padding: 0 2px;
+}
+
+.file-panel-title {
+    font-size: 0.78em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #718096;
+}
+
+.file-panel-link {
+    background: none;
+    border: none;
+    color: #667eea;
+    font-size: 0.8em;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+
+.file-panel-link:hover {
+    background: #edf2f7;
+}
+
+.file-list {
+    list-style: none;
+    margin: 0 0 10px 0;
+    padding: 0;
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+.file-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 6px;
+    border-radius: 6px;
+}
+
+.file-item:hover {
+    background: #f1f5f9;
+}
+
+.file-item.active {
+    background: #ebf0ff;
+}
+
+.file-check {
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.file-name {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.88em;
+    color: #2d3748;
+    padding: 2px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.file-item.active .file-name {
+    font-weight: 600;
+    color: #4c51bf;
+}
+
+.file-name:hover {
+    color: #667eea;
+}
+
+.file-controls {
+    display: flex;
+    gap: 2px;
+    flex-shrink: 0;
+}
+
+.file-ctrl {
+    background: none;
+    border: 1px solid transparent;
+    color: #a0aec0;
+    cursor: pointer;
+    font-size: 0.85em;
+    line-height: 1;
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.file-ctrl:hover:not(:disabled) {
+    background: #e2e8f0;
+    color: #4a5568;
+}
+
+.file-ctrl:disabled {
+    opacity: 0.3;
+    cursor: default;
+}
+
+.file-remove:hover:not(:disabled) {
+    background: #fed7d7;
+    color: #e53e3e;
+}
+
+.combine-btn {
+    width: 100%;
+}
+
+.combine-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+    transform: none;
+}
+
+.combine-btn.active {
+    background: #4c51bf;
 }
 
 /* Output area styling */
@@ -405,8 +552,10 @@ body {
     }
 
     .header,
+    .sidebar,
     .drop-zone,
     .paste-section,
+    .file-panel,
     .output-header,
     .toc,
     .status-message {
@@ -477,6 +626,20 @@ body {
     .drop-zone, .output-container {
         margin: 20px;
     }
+
+    /* Collapse the two-column layout back to a stack on narrow screens. */
+    .main-content.has-docs {
+        flex-direction: column;
+    }
+
+    .main-content.has-docs .sidebar {
+        width: auto;
+    }
+
+    .main-content.has-docs .drop-zone { margin: 20px 20px 12px 20px; }
+    .main-content.has-docs .paste-section { margin: 0 20px 12px 20px; }
+    .main-content.has-docs .file-panel { margin: 0 20px 20px 20px; }
+    .main-content.has-docs .output-container { margin: 20px; }
 
     .action-buttons {
         flex-direction: column;
@@ -681,17 +844,8 @@ html[data-theme="dark"] .drop-icon {
 }
 
 /* Paste section */
-html[data-theme="dark"] .paste-toggle {
+html[data-theme="dark"] .paste-label {
     color: #818cf8;
-}
-
-html[data-theme="dark"] .paste-toggle:hover {
-    background: #252d3d;
-}
-
-html[data-theme="dark"] .paste-panel {
-    background: #252d3d;
-    border-color: #4a5568;
 }
 
 html[data-theme="dark"] .paste-textarea {
@@ -746,6 +900,62 @@ html[data-theme="dark"] .status-info {
     background: #1a2e3d;
     color: #90cdf4;
     border-color: #2c5282;
+}
+
+/* Loaded-file list (sidebar) dark theme */
+html[data-theme="dark"] .file-panel {
+    background: #161b27;
+    border-color: #2d3748;
+}
+
+html[data-theme="dark"] .file-panel-title {
+    color: #718096;
+}
+
+html[data-theme="dark"] .file-panel-link {
+    color: #818cf8;
+}
+
+html[data-theme="dark"] .file-panel-link:hover {
+    background: #252d3d;
+}
+
+html[data-theme="dark"] .file-item:hover {
+    background: #252d3d;
+}
+
+html[data-theme="dark"] .file-item.active {
+    background: #28304a;
+}
+
+html[data-theme="dark"] .file-name {
+    color: #cbd5e0;
+}
+
+html[data-theme="dark"] .file-item.active .file-name {
+    color: #c3dafe;
+}
+
+html[data-theme="dark"] .file-name:hover {
+    color: #93c5fd;
+}
+
+html[data-theme="dark"] .file-ctrl {
+    color: #718096;
+}
+
+html[data-theme="dark"] .file-ctrl:hover:not(:disabled) {
+    background: #2d3748;
+    color: #e2e8f0;
+}
+
+html[data-theme="dark"] .file-remove:hover:not(:disabled) {
+    background: #3b1f1f;
+    color: #fc8181;
+}
+
+html[data-theme="dark"] .combine-btn.active {
+    background: #4c51bf;
 }
 
 /* TOC dark theme */
@@ -876,36 +1086,44 @@ html[data-theme="dark"] .rendered-content a {
             <p id="mainSubtitle">Because explaining asterisks to your spouse is harder than quantum physics</p>
         </div>
 
-        <div class="main-content">
+        <div class="main-content" id="mainContent">
+          <!-- Left side: inputs + loaded-file list -->
+          <div class="sidebar">
             <!-- Input: file drop zone -->
             <div class="drop-zone" id="dropZone">
                 <div class="drop-icon">📁</div>
-                <h3 id="dropZoneHeading">Drop your markdown file here and all your dreams will come true</h3>
-                <p id="dropZoneSubtext">Or click to browse for a .md file (like a civilized person)<br>
-                   <small>Supports all standard markdown syntax (and bad jokes)</small></p>
-                <!-- Hidden file input for click functionality -->
-                <input type="file" class="file-input" id="fileInput" accept=".md,.markdown,.txt">
+                <h3 id="dropZoneHeading">Drop your markdown files here and all your dreams will come true</h3>
+                <p id="dropZoneSubtext">Or click to browse for .md files (like a civilized person)<br>
+                   <small>Drop one file, several, or a whole folder</small></p>
+                <!-- Hidden file input for click functionality (multiple = pick several) -->
+                <input type="file" class="file-input" id="fileInput" accept=".md,.markdown,.txt" multiple>
             </div>
 
-            <!-- Input: paste markdown text -->
+            <!-- Input: paste markdown text. Always visible (thin) so pasting
+                 needs no extra click; drag a corner to grow it. -->
             <div class="paste-section">
-                <button class="paste-toggle" id="pasteToggle" type="button">
-                    <span class="paste-toggle-icon">📋</span>
-                    <span id="pasteToggleLabel">Or paste markdown text</span>
-                </button>
-                <div class="paste-panel" id="pastePanel" hidden>
-                    <textarea
-                        id="pasteTextarea"
-                        class="paste-textarea"
-                        placeholder="Paste your markdown here..."
-                        spellcheck="false"
-                        rows="8"></textarea>
-                    <div class="paste-actions">
-                        <button class="btn btn-secondary" id="pasteCancelBtn" type="button">Cancel</button>
-                        <button class="btn btn-primary" id="pasteRenderBtn" type="button">Render</button>
-                    </div>
+                <label class="paste-label" for="pasteTextarea">📋 Or paste markdown text</label>
+                <textarea
+                    id="pasteTextarea"
+                    class="paste-textarea"
+                    placeholder="Paste markdown here, then Render (or press Ctrl/Cmd+Enter)..."
+                    spellcheck="false"
+                    rows="3"></textarea>
+                <div class="paste-actions">
+                    <button class="btn btn-primary" id="pasteRenderBtn" type="button">Render</button>
                 </div>
             </div>
+
+            <!-- Loaded files: list + combine. Hidden until at least one file. -->
+            <div class="file-panel" id="filePanel" hidden>
+                <div class="file-panel-header">
+                    <span class="file-panel-title" id="filePanelTitle">Files</span>
+                    <button class="file-panel-link" id="selectAllBtn" type="button">Select all</button>
+                </div>
+                <ul class="file-list" id="fileList"></ul>
+                <button class="btn btn-primary combine-btn" id="combineBtn" type="button">🧩 Combine selected</button>
+            </div>
+          </div>
 
             <!-- Right side: Rendered output -->
             <div class="output-container">
@@ -5659,18 +5877,18 @@ const RIDICULOUS_REFERENCES = {
     ],
 
     dropZoneHeadings: [
-        "Drop your markdown file here and all your dreams will come true",
+        "Drop your markdown files here and all your dreams will come true",
         "Drop it like it's .md",
         "Nobody puts markdown in a corner",
-        "I'll be back... with your converted file",
+        "I'll be back... with your converted files",
         "Choose your fighter: Drag or Browse",
         "This is where the magic happens, Wayne",
-        "Release the kraken! (or just drop your file)",
+        "Release the kraken! (or just drop your files)",
         "Say hello to my little friend... the file browser"
     ],
 
     dropZoneSubtext: [
-        "Or click to browse for a .md file (like a civilized person)",
+        "Or click to browse for .md files (like a civilized person)",
         "Supports all standard markdown syntax (and bad jokes)",
         "Warning: May cause uncontrollable productivity",
         "Side effects may include: clarity, readability, and mild euphoria",
@@ -5731,22 +5949,35 @@ const output = document.getElementById('output');
 const copyBtn = document.getElementById('copyBtn');
 const saveBtn = document.getElementById('saveBtn');
 const clearBtn = document.getElementById('clearBtn');
-const pasteToggle = document.getElementById('pasteToggle');
-const pastePanel = document.getElementById('pastePanel');
 const pasteTextarea = document.getElementById('pasteTextarea');
 const pasteRenderBtn = document.getElementById('pasteRenderBtn');
-const pasteCancelBtn = document.getElementById('pasteCancelBtn');
-const pasteToggleLabel = document.getElementById('pasteToggleLabel');
 const themeToggle = document.getElementById('themeToggle');
 const viewToggleBtn = document.getElementById('viewToggleBtn');
 const printBtn = document.getElementById('printBtn');
 const saveMdBtn = document.getElementById('saveMdBtn');
+const mainContent = document.getElementById('mainContent');
+const filePanel = document.getElementById('filePanel');
+const filePanelTitle = document.getElementById('filePanelTitle');
+const fileList = document.getElementById('fileList');
+const selectAllBtn = document.getElementById('selectAllBtn');
+const combineBtn = document.getElementById('combineBtn');
 
 // Store the processed HTML and original markdown for export and source-view.
+// These represent "what is currently rendered" — a single selected document or
+// the combined view — so the export buttons, TOC, and source toggle don't need
+// to know which it is.
 let processedHTML = '';
 let originalMarkdown = '';
 let originalFileName = '';
 let viewMode = 'rendered'; // 'rendered' | 'source'
+
+// The loaded-file collection. Each entry: { id, name, markdown, checked }.
+// `documents` is the source of truth; rendering reads from it. `activeDocId`
+// is the single doc on screen, or null when the combined view is showing.
+let documents = [];
+let activeDocId = null;     // id of the single document on screen, or null
+let combinedView = false;   // true when the combined document is on screen
+let docIdCounter = 0;
 
 // Browsers use document.title as the suggested filename when saving to PDF
 // from the print dialog. Capture the default so clear can restore it.
@@ -5759,7 +5990,7 @@ function initializeRidiculousness() {
 
     document.getElementById('dropZoneHeading').textContent = getRandomReference('dropZoneHeadings');
     document.getElementById('dropZoneSubtext').innerHTML =
-        getRandomReference('dropZoneSubtext') + '<br><small>Supports all standard markdown syntax (and bad jokes)</small>';
+        getRandomReference('dropZoneSubtext') + '<br><small>Drop one file, several, or a whole folder</small>';
 
     document.getElementById('emptyStateMessage').textContent = getRandomReference('emptyStates');
 
@@ -5795,11 +6026,7 @@ dropZone.addEventListener('dragleave', (e) => {
 dropZone.addEventListener('drop', (e) => {
     e.preventDefault();
     dropZone.classList.remove('drag-over');
-
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-        handleFile(files[0]);
-    }
+    ingestDataTransfer(e.dataTransfer);
 });
 
 // Click to browse
@@ -5808,9 +6035,9 @@ dropZone.addEventListener('click', () => {
 });
 
 fileInput.addEventListener('change', (e) => {
-    if (e.target.files.length > 0) {
-        handleFile(e.target.files[0]);
-    }
+    addFiles(Array.from(e.target.files));
+    // Reset so picking the same file(s) again still fires a change event.
+    fileInput.value = '';
 });
 
 // Shared render pipeline. Used by both file drop and paste-text inputs.
@@ -5828,7 +6055,6 @@ function renderMarkdown(markdownText, displayName) {
         displayRenderedContent(htmlContent, displayName);
 
         dropZone.classList.add('compact');
-        hidePastePanel();
         copyBtn.style.display = 'block';
         saveBtn.style.display = 'block';
         clearBtn.style.display = 'block';
@@ -5841,21 +6067,328 @@ function renderMarkdown(markdownText, displayName) {
     }
 }
 
-// File input handler
-function handleFile(file) {
-    const validExtensions = ['.md', '.markdown', '.txt'];
-    const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+// ----- File ingestion (multi-file + folder) -----
 
-    if (!validExtensions.includes(fileExtension)) {
+const VALID_EXTENSIONS = ['.md', '.markdown', '.txt'];
+
+function isValidMarkdownFile(name) {
+    const ext = '.' + name.split('.').pop().toLowerCase();
+    return VALID_EXTENSIONS.includes(ext);
+}
+
+function readFileAsText(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = () => reject(reader.error || new Error('read failed'));
+        reader.readAsText(file);
+    });
+}
+
+// Handle a drop. When the browser exposes the entries API we can read dropped
+// folders; otherwise fall back to the flat FileList. Folder reads are flat —
+// top-level files plus one level into each dropped directory, no recursion.
+function ingestDataTransfer(dataTransfer) {
+    const items = dataTransfer.items;
+    const supportsEntries =
+        items && items.length && typeof items[0].webkitGetAsEntry === 'function';
+
+    if (!supportsEntries) {
+        addFiles(Array.from(dataTransfer.files || []));
+        return;
+    }
+
+    // webkitGetAsEntry must be called synchronously — the items list is cleared
+    // once this handler returns, but the entry objects stay valid afterward.
+    const entries = [];
+    for (let i = 0; i < items.length; i++) {
+        const entry = items[i].webkitGetAsEntry();
+        if (entry) entries.push(entry);
+    }
+    if (!entries.length) {
+        addFiles(Array.from(dataTransfer.files || []));
+        return;
+    }
+
+    collectFilesFromEntries(entries)
+        .then((files) => addFiles(files))
+        .catch((err) => {
+            console.error('Folder read error:', err);
+            showStatus(getRandomReference('errorMessages'), 'error');
+        });
+}
+
+function collectFilesFromEntries(entries) {
+    const tasks = entries.map((entry) => {
+        if (entry.isFile) {
+            return entryToFile(entry).then((f) => (f ? [f] : []));
+        }
+        if (entry.isDirectory) {
+            return readAllDirEntries(entry.createReader()).then((children) => {
+                const fileEntries = children.filter((c) => c.isFile);
+                return Promise.all(fileEntries.map(entryToFile))
+                    .then((files) => files.filter(Boolean));
+            });
+        }
+        return Promise.resolve([]);
+    });
+    return Promise.all(tasks).then((groups) => groups.flat());
+}
+
+// A directory reader returns entries in batches; keep reading until it's empty.
+function readAllDirEntries(reader) {
+    return new Promise((resolve, reject) => {
+        const all = [];
+        const readBatch = () => {
+            reader.readEntries((batch) => {
+                if (!batch.length) {
+                    resolve(all);
+                    return;
+                }
+                all.push(...batch);
+                readBatch();
+            }, reject);
+        };
+        readBatch();
+    });
+}
+
+function entryToFile(fileEntry) {
+    return new Promise((resolve) => {
+        fileEntry.file((file) => resolve(file), () => resolve(null));
+    });
+}
+
+// Read, validate, and add a batch of files to the document collection.
+async function addFiles(fileArray) {
+    const valid = fileArray.filter((f) => isValidMarkdownFile(f.name));
+    const skipped = fileArray.length - valid.length;
+
+    if (!valid.length) {
+        if (fileArray.length) showStatus(getRandomReference('errorMessages'), 'error');
+        return;
+    }
+
+    const newDocs = [];
+    for (const file of valid) {
+        try {
+            const text = await readFileAsText(file);
+            newDocs.push(makeDoc(file.name, text));
+        } catch (err) {
+            console.error('Read error for', file.name, err);
+        }
+    }
+    if (!newDocs.length) {
         showStatus(getRandomReference('errorMessages'), 'error');
         return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (e) => renderMarkdown(e.target.result, file.name);
-    reader.onerror = () => showStatus(getRandomReference('errorMessages'), 'error');
-    reader.readAsText(file);
+    // Alphabetical (numeric-aware) so a folder of 01-, 02-, ... lands in order.
+    newDocs.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+    documents.push(...newDocs);
+
+    // Show the first newly-added file if nothing is on screen yet.
+    if (activeDocId === null && !combinedView) {
+        selectDocument(newDocs[0].id);
+    } else {
+        renderFilePanel();
+    }
+
+    if (skipped > 0) {
+        const n = newDocs.length;
+        showStatus(
+            `Added ${n} file${n === 1 ? '' : 's'}; skipped ${skipped} non-markdown file${skipped === 1 ? '' : 's'}.`,
+            'info'
+        );
+    }
 }
+
+function makeDoc(name, markdown) {
+    docIdCounter += 1;
+    return { id: docIdCounter, name, markdown, checked: true };
+}
+
+// Add a single document (used by the paste-text input) and view it.
+function addDocument(name, markdown) {
+    const doc = makeDoc(name, markdown);
+    documents.push(doc);
+    selectDocument(doc.id);
+    return doc;
+}
+
+// ----- Document selection, ordering, removal -----
+
+function selectDocument(id) {
+    const doc = documents.find((d) => d.id === id);
+    if (!doc) return;
+    activeDocId = id;
+    combinedView = false;
+    renderMarkdown(doc.markdown, doc.name);
+    renderFilePanel();
+}
+
+function moveDocument(id, direction) {
+    const i = documents.findIndex((d) => d.id === id);
+    if (i === -1) return;
+    const j = i + direction;
+    if (j < 0 || j >= documents.length) return;
+    [documents[i], documents[j]] = [documents[j], documents[i]];
+    renderFilePanel();
+    // Reflect the new order in the combined view if it's showing.
+    if (combinedView) renderCombined();
+}
+
+function removeDocument(id) {
+    const i = documents.findIndex((d) => d.id === id);
+    if (i === -1) return;
+    documents.splice(i, 1);
+
+    if (!documents.length) {
+        resetToEmpty();
+        return;
+    }
+
+    const neighbor = documents[Math.min(i, documents.length - 1)];
+
+    if (combinedView) {
+        const checkedCount = documents.filter((d) => d.checked).length;
+        if (checkedCount >= 2) {
+            renderFilePanel();
+            renderCombined();
+        } else {
+            // Not enough left to combine — drop back to a single document.
+            selectDocument(neighbor.id);
+        }
+        return;
+    }
+
+    if (activeDocId === id) {
+        selectDocument(neighbor.id);
+    } else {
+        renderFilePanel();
+    }
+}
+
+// ----- Combine -----
+
+// Join the checked documents into one markdown source. Each file gets an H1 of
+// its name and a --- rule between files, so the combined TOC sections by file.
+function buildCombinedMarkdown(docs) {
+    return docs
+        .map((doc) => {
+            const title = doc.name.replace(/\.[^/.]+$/, '');
+            return `# ${title}\n\n${doc.markdown.trim()}`;
+        })
+        .join('\n\n---\n\n') + '\n';
+}
+
+function renderCombined() {
+    const checked = documents.filter((d) => d.checked);
+    if (checked.length < 2) return;
+    combinedView = true;
+    activeDocId = null;
+    renderMarkdown(buildCombinedMarkdown(checked), 'combined.md');
+    renderFilePanel();
+}
+
+// ----- Sidebar file panel -----
+
+function updateLayout() {
+    mainContent.classList.toggle('has-docs', documents.length > 0);
+}
+
+function updateCombineButton() {
+    const checkedCount = documents.filter((d) => d.checked).length;
+    combineBtn.disabled = checkedCount < 2;
+    combineBtn.classList.toggle('active', combinedView);
+    combineBtn.textContent =
+        checkedCount >= 2 ? `🧩 Combine ${checkedCount} files` : '🧩 Combine selected';
+}
+
+function renderFilePanel() {
+    updateLayout();
+
+    if (!documents.length) {
+        filePanel.hidden = true;
+        fileList.innerHTML = '';
+        return;
+    }
+
+    filePanel.hidden = false;
+    filePanelTitle.textContent =
+        documents.length === 1 ? '1 file' : `${documents.length} files`;
+    selectAllBtn.textContent = documents.every((d) => d.checked) ? 'Select none' : 'Select all';
+
+    fileList.innerHTML = '';
+    documents.forEach((doc, index) => {
+        const li = document.createElement('li');
+        li.className = 'file-item';
+        if (!combinedView && doc.id === activeDocId) li.classList.add('active');
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.className = 'file-check';
+        checkbox.checked = doc.checked;
+        checkbox.title = 'Include when combining';
+        checkbox.addEventListener('change', () => {
+            doc.checked = checkbox.checked;
+            selectAllBtn.textContent =
+                documents.every((d) => d.checked) ? 'Select none' : 'Select all';
+            updateCombineButton();
+        });
+        li.appendChild(checkbox);
+
+        const nameBtn = document.createElement('button');
+        nameBtn.type = 'button';
+        nameBtn.className = 'file-name';
+        nameBtn.textContent = doc.name;
+        nameBtn.title = doc.name;
+        nameBtn.addEventListener('click', () => selectDocument(doc.id));
+        li.appendChild(nameBtn);
+
+        const controls = document.createElement('div');
+        controls.className = 'file-controls';
+
+        const upBtn = document.createElement('button');
+        upBtn.type = 'button';
+        upBtn.className = 'file-ctrl';
+        upBtn.textContent = '↑';
+        upBtn.title = 'Move up';
+        upBtn.disabled = index === 0;
+        upBtn.addEventListener('click', () => moveDocument(doc.id, -1));
+        controls.appendChild(upBtn);
+
+        const downBtn = document.createElement('button');
+        downBtn.type = 'button';
+        downBtn.className = 'file-ctrl';
+        downBtn.textContent = '↓';
+        downBtn.title = 'Move down';
+        downBtn.disabled = index === documents.length - 1;
+        downBtn.addEventListener('click', () => moveDocument(doc.id, 1));
+        controls.appendChild(downBtn);
+
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'file-ctrl file-remove';
+        removeBtn.textContent = '✕';
+        removeBtn.title = 'Remove from list';
+        removeBtn.addEventListener('click', () => removeDocument(doc.id));
+        controls.appendChild(removeBtn);
+
+        li.appendChild(controls);
+        fileList.appendChild(li);
+    });
+
+    updateCombineButton();
+}
+
+selectAllBtn.addEventListener('click', () => {
+    const allChecked = documents.length > 0 && documents.every((d) => d.checked);
+    documents.forEach((d) => { d.checked = !allChecked; });
+    renderFilePanel();
+});
+
+combineBtn.addEventListener('click', renderCombined);
 
 function displayRenderedContent(htmlContent, fileName) {
     // Build the banner with DOM APIs so the filename can't be HTML-injected.
@@ -6076,38 +6609,17 @@ function showStatus(message, type) {
     }
 }
 
-// Paste-text input handlers
-function showPastePanel() {
-    pastePanel.hidden = false;
-    pasteToggleLabel.textContent = 'Hide paste area';
-    pasteTextarea.focus();
-}
-
-function hidePastePanel() {
-    pastePanel.hidden = true;
-    pasteToggleLabel.textContent = 'Or paste markdown text';
-}
-
-pasteToggle.addEventListener('click', () => {
-    if (pastePanel.hidden) {
-        showPastePanel();
-    } else {
-        hidePastePanel();
-    }
-});
-
-pasteCancelBtn.addEventListener('click', () => {
-    pasteTextarea.value = '';
-    hidePastePanel();
-});
-
+// Paste-text input handlers. The paste area is always visible (thin), so there
+// is no panel to show or hide — Render turns the text into a document.
 pasteRenderBtn.addEventListener('click', () => {
     const text = pasteTextarea.value.trim();
     if (!text) {
         pasteTextarea.focus();
         return;
     }
-    renderMarkdown(text, deriveNameFromMarkdown(text));
+    // Pasted text becomes a document in the list like any dropped file.
+    addDocument(deriveNameFromMarkdown(text), text);
+    pasteTextarea.value = '';
 });
 
 // Ctrl/Cmd+Enter inside the textarea triggers render
@@ -6293,12 +6805,12 @@ function createCompleteHTMLDocument(content) {
 </html>`;
 }
 
-// Clear/reset
-clearBtn.addEventListener('click', () => {
-    dropZone.classList.remove('compact');
-    copyBtn.style.display = 'none';
-    saveBtn.style.display = 'none';
-    clearBtn.style.display = 'none';
+// Reset everything back to the empty state: drop the whole collection, hide the
+// action buttons and file panel, and restore the welcome message.
+function resetToEmpty() {
+    documents = [];
+    activeDocId = null;
+    combinedView = false;
 
     processedHTML = '';
     originalMarkdown = '';
@@ -6306,11 +6818,17 @@ clearBtn.addEventListener('click', () => {
     viewMode = 'rendered';
     fileInput.value = '';
     pasteTextarea.value = '';
-    hidePastePanel();
+
+    dropZone.classList.remove('compact');
+    copyBtn.style.display = 'none';
+    saveBtn.style.display = 'none';
+    clearBtn.style.display = 'none';
     viewToggleBtn.style.display = 'none';
     printBtn.style.display = 'none';
     saveMdBtn.style.display = 'none';
     document.title = DEFAULT_TITLE;
+
+    renderFilePanel(); // hides the panel and removes the two-column layout
 
     output.innerHTML = `
         <div style="text-align: center; padding: 60px 20px; color: #a0aec0;">
@@ -6319,6 +6837,11 @@ clearBtn.addEventListener('click', () => {
             <p style="font-size: 0.9em; margin-top: 10px;">Ready to make your markdown human-readable!</p>
         </div>
     `;
+}
+
+// Clear/reset
+clearBtn.addEventListener('click', () => {
+    resetToEmpty();
 
     const originalText = clearBtn.textContent;
     clearBtn.textContent = '✅ Cleared!';

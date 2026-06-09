@@ -83,17 +83,8 @@ html[data-theme="dark"] .drop-icon {
 }
 
 /* Paste section */
-html[data-theme="dark"] .paste-toggle {
+html[data-theme="dark"] .paste-label {
     color: #818cf8;
-}
-
-html[data-theme="dark"] .paste-toggle:hover {
-    background: #252d3d;
-}
-
-html[data-theme="dark"] .paste-panel {
-    background: #252d3d;
-    border-color: #4a5568;
 }
 
 html[data-theme="dark"] .paste-textarea {
@@ -148,6 +139,62 @@ html[data-theme="dark"] .status-info {
     background: #1a2e3d;
     color: #90cdf4;
     border-color: #2c5282;
+}
+
+/* Loaded-file list (sidebar) dark theme */
+html[data-theme="dark"] .file-panel {
+    background: #161b27;
+    border-color: #2d3748;
+}
+
+html[data-theme="dark"] .file-panel-title {
+    color: #718096;
+}
+
+html[data-theme="dark"] .file-panel-link {
+    color: #818cf8;
+}
+
+html[data-theme="dark"] .file-panel-link:hover {
+    background: #252d3d;
+}
+
+html[data-theme="dark"] .file-item:hover {
+    background: #252d3d;
+}
+
+html[data-theme="dark"] .file-item.active {
+    background: #28304a;
+}
+
+html[data-theme="dark"] .file-name {
+    color: #cbd5e0;
+}
+
+html[data-theme="dark"] .file-item.active .file-name {
+    color: #c3dafe;
+}
+
+html[data-theme="dark"] .file-name:hover {
+    color: #93c5fd;
+}
+
+html[data-theme="dark"] .file-ctrl {
+    color: #718096;
+}
+
+html[data-theme="dark"] .file-ctrl:hover:not(:disabled) {
+    background: #2d3748;
+    color: #e2e8f0;
+}
+
+html[data-theme="dark"] .file-remove:hover:not(:disabled) {
+    background: #3b1f1f;
+    color: #fc8181;
+}
+
+html[data-theme="dark"] .combine-btn.active {
+    background: #4c51bf;
 }
 
 /* TOC dark theme */

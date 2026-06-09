@@ -45,6 +45,34 @@ body {
     min-height: 600px;
 }
 
+/* Sidebar holds the inputs and the loaded-file list. Empty state = a single
+   stacked column (sidebar above output). Once files are loaded, .has-docs
+   flips the layout to two columns: a fixed-width sidebar and a flexible output. */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+}
+
+.main-content.has-docs {
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+.main-content.has-docs .sidebar {
+    width: 280px;
+    flex-shrink: 0;
+}
+
+.main-content.has-docs .drop-zone { margin: 30px 0 12px 30px; }
+.main-content.has-docs .paste-section { margin: 0 0 12px 30px; }
+.main-content.has-docs .file-panel { margin: 0 0 30px 30px; }
+
+.main-content.has-docs .output-container {
+    flex: 1;
+    min-width: 0; /* let the column shrink instead of overflowing on long lines */
+    margin: 30px 30px 30px 24px;
+}
+
 /* Drop zone styling - compact and efficient */
 .drop-zone {
     border: 3px dashed #cbd5e0;
@@ -123,47 +151,24 @@ body {
     margin: 0 30px 20px 30px;
 }
 
-.paste-toggle {
-    background: none;
-    border: none;
+.paste-label {
+    display: block;
     color: #667eea;
-    font-size: 0.95em;
+    font-size: 0.9em;
     font-weight: 500;
-    cursor: pointer;
-    padding: 6px 10px;
-    border-radius: 6px;
-    transition: background 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.paste-toggle:hover {
-    background: #edf2f7;
-}
-
-.paste-toggle-icon {
-    font-size: 1.1em;
-}
-
-.paste-panel {
-    margin-top: 10px;
-    padding: 15px;
-    background: #f7fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
+    margin-bottom: 6px;
 }
 
 .paste-textarea {
     width: 100%;
-    padding: 12px;
+    padding: 10px 12px;
     border: 1px solid #cbd5e0;
     border-radius: 6px;
     font-family: 'Monaco', 'Consolas', monospace;
     font-size: 0.9em;
     line-height: 1.5;
     resize: vertical;
-    min-height: 150px;
+    min-height: 52px;
     color: #2d3748;
     background: white;
 }
@@ -178,7 +183,149 @@ body {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
-    margin-top: 12px;
+    margin-top: 8px;
+}
+
+/* Loaded-file list (sidebar) */
+.file-panel {
+    margin: 0 30px 20px 30px;
+    padding: 10px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+
+.file-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    padding: 0 2px;
+}
+
+.file-panel-title {
+    font-size: 0.78em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #718096;
+}
+
+.file-panel-link {
+    background: none;
+    border: none;
+    color: #667eea;
+    font-size: 0.8em;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+
+.file-panel-link:hover {
+    background: #edf2f7;
+}
+
+.file-list {
+    list-style: none;
+    margin: 0 0 10px 0;
+    padding: 0;
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+.file-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 6px;
+    border-radius: 6px;
+}
+
+.file-item:hover {
+    background: #f1f5f9;
+}
+
+.file-item.active {
+    background: #ebf0ff;
+}
+
+.file-check {
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.file-name {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.88em;
+    color: #2d3748;
+    padding: 2px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.file-item.active .file-name {
+    font-weight: 600;
+    color: #4c51bf;
+}
+
+.file-name:hover {
+    color: #667eea;
+}
+
+.file-controls {
+    display: flex;
+    gap: 2px;
+    flex-shrink: 0;
+}
+
+.file-ctrl {
+    background: none;
+    border: 1px solid transparent;
+    color: #a0aec0;
+    cursor: pointer;
+    font-size: 0.85em;
+    line-height: 1;
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.file-ctrl:hover:not(:disabled) {
+    background: #e2e8f0;
+    color: #4a5568;
+}
+
+.file-ctrl:disabled {
+    opacity: 0.3;
+    cursor: default;
+}
+
+.file-remove:hover:not(:disabled) {
+    background: #fed7d7;
+    color: #e53e3e;
+}
+
+.combine-btn {
+    width: 100%;
+}
+
+.combine-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+    transform: none;
+}
+
+.combine-btn.active {
+    background: #4c51bf;
 }
 
 /* Output area styling */
@@ -377,8 +524,10 @@ body {
     }
 
     .header,
+    .sidebar,
     .drop-zone,
     .paste-section,
+    .file-panel,
     .output-header,
     .toc,
     .status-message {
@@ -449,6 +598,20 @@ body {
     .drop-zone, .output-container {
         margin: 20px;
     }
+
+    /* Collapse the two-column layout back to a stack on narrow screens. */
+    .main-content.has-docs {
+        flex-direction: column;
+    }
+
+    .main-content.has-docs .sidebar {
+        width: auto;
+    }
+
+    .main-content.has-docs .drop-zone { margin: 20px 20px 12px 20px; }
+    .main-content.has-docs .paste-section { margin: 0 20px 12px 20px; }
+    .main-content.has-docs .file-panel { margin: 0 20px 20px 20px; }
+    .main-content.has-docs .output-container { margin: 20px; }
 
     .action-buttons {
         flex-direction: column;

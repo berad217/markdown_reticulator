@@ -23,18 +23,18 @@ const RIDICULOUS_REFERENCES = {
     ],
 
     dropZoneHeadings: [
-        "Drop your markdown file here and all your dreams will come true",
+        "Drop your markdown files here and all your dreams will come true",
         "Drop it like it's .md",
         "Nobody puts markdown in a corner",
-        "I'll be back... with your converted file",
+        "I'll be back... with your converted files",
         "Choose your fighter: Drag or Browse",
         "This is where the magic happens, Wayne",
-        "Release the kraken! (or just drop your file)",
+        "Release the kraken! (or just drop your files)",
         "Say hello to my little friend... the file browser"
     ],
 
     dropZoneSubtext: [
-        "Or click to browse for a .md file (like a civilized person)",
+        "Or click to browse for .md files (like a civilized person)",
         "Supports all standard markdown syntax (and bad jokes)",
         "Warning: May cause uncontrollable productivity",
         "Side effects may include: clarity, readability, and mild euphoria",
