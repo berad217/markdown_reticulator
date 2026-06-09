@@ -16,7 +16,7 @@ A single self-contained HTML file that turns `.md` files into a clean rendered d
 - **DEVLOG:** [`docs/DEVLOG.md`](docs/DEVLOG.md) — what was built and why. Append a dated entry per meaningful session.
 - **Human-facing README:** [`README.md`](README.md) — what visitors to the GitHub repo see. Contains the 1-click download button.
 - **Test plan:** [`tests/TEST-PLAN.md`](tests/TEST-PLAN.md) — structured manual test procedure runnable by a browser-control agent. Fixtures in [`tests/fixtures/`](tests/fixtures/). No automated tests by design.
-- **Handover:** none yet. Solo dev, short sessions, hasn't needed one. If you start one, put it at `docs/.agents/current-handover.md` (create the folder).
+- **Handover:** [`docs/.agents/current-handover.md`](docs/.agents/current-handover.md) — kept lean (ephemeral delta only). Solo dev / short sessions, so it's often near-empty between tasks. Don't pad it; if it's in a file, it doesn't belong here.
 
 **Personal style for this human:** lives in his global Claude memory at `~/.claude/CLAUDE.md` (Windows path: `C:\Users\Brad\.claude\CLAUDE.md`). If you can read user-global files, do — TL;DR below in "About this human".
 
