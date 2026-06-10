@@ -216,3 +216,28 @@ That's why combine was nearly free: set the globals to the merged markdown and e
 ### Still ahead
 
 - Possible polish: drag-to-reorder; persist the loaded set across reloads; a per-file "Save .md" from the row.
+
+---
+
+## 2026-06-10 — Open .md from Explorer (Windows Send To launcher)
+
+Brad wanted to open a `.md` from Explorer and see it rendered, instead of opening the app and dragging the file in.
+
+### The constraint
+
+A local HTML page is sandboxed: when the OS opens a file "with" the browser, it can't inject that file's bytes into the page — the page only ever sees files dragged or picked. So `.md → the HTML file` can't work directly. This is a hard wall, not a missing feature.
+
+### The bridge
+
+A small **local** launcher does the file-reading the browser won't. `integrations/windows/Open-Markdown.ps1` reads the selected file(s), embeds them as base64(JSON array of `{name, md}`) into a copy of the built app, writes a self-contained temp HTML to `%TEMP%`, and opens it in the default browser. A ~25-line app hook (`loadEmbeddedPayload`) reads the empty `#mdPayload` `<script>` slot on boot and renders via the normal `addDocument` path (still DOMPurify-sanitized). Empty slot = today's behavior, so the shared single-file artifact is unaffected.
+
+### Decisions
+
+- **Temp-file embed, not URL hash.** Considered passing the markdown in the `file://` URL hash (no temp file) — rejected: the Windows command line (~32K chars) caps the argument, so anything but tiny files breaks. Temp-embed has no size limit (cost: a ~3.5 MB temp write per open, trivial on SSD).
+- **base64(JSON array), multi-file aware.** Send To hands all selected files to one invocation; embedding an array means selecting several `.md` → Send To opens them as a set in the sidebar (combine-able), instead of silently dropping all but the first.
+- **Send To, not registry.** Brad picked the lightest integration — no registry, no admin, reversible (`Install-SendTo.ps1 -Uninstall`). Win10/11's UserChoice hash makes a fully-programmatic "default app" impossible anyway; Send To sidesteps it. The registry/default-double-click route is documented in the integration README as the heavier alternative.
+- **Per-machine, not product.** The launcher reads `dist/` but never modifies it, and lives in `integrations/windows/`, out of the emailed artifact. Single-file delivery constraint intact.
+
+### Verified
+
+Ran the launcher (`-NoLaunch`) on one and two fixtures, served the generated temp pages, and loaded them in a real browser: single-file auto-renders (title + sidebar + content); multi-file shows both with the first selected and combine enabled. Installed and inspected the Send To shortcut (targets `powershell` → launcher). App bundle unchanged at ~3.49 MB (the payload slot is a few bytes). Not released — it's a local convenience; if a future release ships, the harmless slot hook rides along.

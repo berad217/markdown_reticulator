@@ -37,6 +37,7 @@ scripts/            generate-highlight-themes.py — regenerates the scoped high
 
 docs/               spec.md, DEVLOG.md
 tests/              TEST-PLAN.md, REPORT-TEMPLATE.md, REPORT-<date>.md, fixtures/*.md
+integrations/       windows/ — optional "Open .md with Reticulator" launcher (Send To). Per-machine convenience; NOT part of the shipped file.
 ```
 
 **Build:**

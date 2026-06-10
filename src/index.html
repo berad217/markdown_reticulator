@@ -31,6 +31,12 @@
     <link rel="stylesheet" href="vendor/highlight-themes.css">
 </head>
 <body>
+    <!-- Launcher payload slot. A local "Open with" / Send-To launcher injects
+         base64(JSON array of {name, md}) here so opening a .md from Explorer
+         shows it pre-rendered. Empty in the shared single-file app — no effect
+         on normal drag-drop use. -->
+    <script id="mdPayload" type="text/plain"></script>
+
     <div class="container">
         <div class="header">
             <button

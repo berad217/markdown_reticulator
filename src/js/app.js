@@ -272,6 +272,38 @@ function addDocument(name, markdown) {
     return doc;
 }
 
+// If a local "Open with" / Send-To launcher injected markdown into the
+// #mdPayload slot (base64 of a JSON array of {name, md}), load those documents
+// on boot. Empty in the shared file, so this is a no-op for normal use. Content
+// still flows through the same DOMPurify-sanitized render path as dropped files.
+function loadEmbeddedPayload() {
+    const el = document.getElementById('mdPayload');
+    if (!el) return;
+    const b64 = (el.textContent || '').trim();
+    if (!b64) return;
+
+    let entries;
+    try {
+        const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+        entries = JSON.parse(new TextDecoder('utf-8').decode(bytes));
+    } catch (err) {
+        console.error('Embedded payload could not be decoded:', err);
+        return;
+    }
+    if (!Array.isArray(entries)) return;
+
+    const added = [];
+    entries.forEach((entry) => {
+        if (entry && typeof entry.md === 'string') {
+            added.push(makeDoc(entry.name || deriveNameFromMarkdown(entry.md), entry.md));
+        }
+    });
+    if (!added.length) return;
+
+    documents.push(...added);
+    selectDocument(added[0].id); // renders the first; calls renderFilePanel()
+}
+
 // ----- Document selection, ordering, removal -----
 
 function selectDocument(id) {
@@ -996,6 +1028,7 @@ applyTheme(getInitialTheme());
 
 // Boot
 initializeRidiculousness();
+loadEmbeddedPayload(); // renders a file passed by the Windows launcher, if any
 console.log('🚀 The Markdown Whisperer has awakened!');
 console.log('📚 Supported features: GFM, tables, code blocks, and questionable humor');
 console.log('🎭 References randomized. Your spouse will either laugh or file for divorce.');
