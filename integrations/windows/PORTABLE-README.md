@@ -1,39 +1,45 @@
-# Markdown Reticulator — open `.md` files from Explorer (Windows)
+# Markdown Reticulator — Right-Click Edition
 
-This folder lets you right-click a markdown file and open it rendered, without
-opening the app and dragging the file in.
+You've got the Markdown Whisperer. This bolts it onto your right-click menu so a
+`.md` file opens *rendered* with a couple of clicks — no opening the app and
+dragging files in like it's the Stone Age.
 
-**Contents:** `markdown-reticulator.html` (the app), `Open-Markdown.ps1` (the
-launcher), `Install-SendTo.ps1` (one-time setup).
+**What's in the box:** `markdown-reticulator.html` (the app itself),
+`Open-Markdown.ps1` (does the heavy lifting), `Install-SendTo.ps1` (the one-time setup).
 
 ## Install (once)
 
-1. Put this whole folder wherever you want to keep it (e.g. `Documents`). The
-   launcher finds the app sitting next to it, so **keep these files together.**
+1. Park this whole folder somewhere it can live (Documents is fine). The launcher
+   looks for the app sitting right next to it — **keep the gang together**, or the
+   magic stops working.
 2. Open PowerShell in this folder and run:
 
    ```powershell
    powershell -ExecutionPolicy Bypass -File .\Install-SendTo.ps1
    ```
 
-   (If these files came as a download/email, Windows may mark them blocked. If
-   the launcher won't run, clear it once: `Get-ChildItem *.ps1 | Unblock-File`.)
+   If these files arrived by email or download, Windows may quarantine them out of
+   an abundance of paranoia. If the launcher refuses to cooperate, spring them once:
+
+   ```powershell
+   Get-ChildItem *.ps1 | Unblock-File
+   ```
 
 ## Use it
 
-Right-click any `.md` file → **Send To → Markdown Reticulator**. It opens
-rendered in your default browser. Select several `.md` files first to open them
-together as a set.
+Right-click any `.md` file → **Send To → Markdown Reticulator**. Boom goes the
+dynamite — it opens rendered in your browser. Select several files first and the
+whole fellowship comes along (they pile into the sidebar; combine them if you feel
+like it).
 
-## Remove it
+## Make it stop
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\Install-SendTo.ps1 -Uninstall
 ```
 
-## Notes
+## Fine print
 
-- If you move this folder, re-run the install step (the shortcut points at the
-  launcher's location).
-- No drag-drop needed, but it still works: you can always open
-  `markdown-reticulator.html` directly and drop files onto it.
+- Move this folder later and the shortcut loses the scent — just re-run the install step.
+- Not feeling the right-click life? You can always open `markdown-reticulator.html`
+  and drag files onto it like a civilized person.
