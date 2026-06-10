@@ -39,10 +39,17 @@ function Fail($message) {
     exit 1
 }
 
-# Locate the built single-file app: integrations/windows -> repo root -> dist.
-$appPath = Join-Path $PSScriptRoot '..\..\dist\markdown-reticulator.html'
-if (-not (Test-Path $appPath -PathType Leaf)) {
-    Fail("Markdown Reticulator app not found at:`n$appPath`n`nRun build.py first.")
+# Locate the built single-file app. Works in two layouts:
+#   1. Portable: markdown-reticulator.html sits next to this script (shared folder).
+#   2. In-repo:  integrations/windows -> repo root -> dist/.
+$candidates = @(
+    (Join-Path $PSScriptRoot 'markdown-reticulator.html'),
+    (Join-Path $PSScriptRoot '..\..\dist\markdown-reticulator.html')
+)
+$appPath = $candidates | Where-Object { Test-Path $_ -PathType Leaf } | Select-Object -First 1
+if (-not $appPath) {
+    Fail("Markdown Reticulator app not found. Looked for:`n - " + ($candidates -join "`n - ") +
+         "`n`nPut markdown-reticulator.html next to this script, or run build.py in the repo.")
 }
 
 # Read and validate the selected files.

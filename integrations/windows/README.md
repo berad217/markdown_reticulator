@@ -39,6 +39,26 @@ If PowerShell blocks the script, run it once as:
 
 (or just delete `Markdown Reticulator.lnk` from `shell:sendto`.)
 
+## Install on another machine
+
+The launcher finds the app either next to itself or in the repo's `dist/`, so to
+move it to another PC you just need the app + the two scripts in one folder.
+`Build-Package.ps1` assembles that for you:
+
+```powershell
+# from this folder, on the source machine
+.\Build-Package.ps1 -Zip      # -> dist-package/MarkdownReticulator(.zip)
+```
+
+Copy the folder (or zip) to the other machine, then there:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\Install-SendTo.ps1
+```
+
+The packaged `README.md` (from `PORTABLE-README.md`) has the same steps for the
+recipient. `dist-package/` is gitignored — it's a rebuildable artifact.
+
 ## Notes
 
 - **Rebuild after app changes.** The launcher reads `dist/markdown-reticulator.html`,

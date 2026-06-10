@@ -241,3 +241,11 @@ A small **local** launcher does the file-reading the browser won't. `integration
 ### Verified
 
 Ran the launcher (`-NoLaunch`) on one and two fixtures, served the generated temp pages, and loaded them in a real browser: single-file auto-renders (title + sidebar + content); multi-file shows both with the first selected and combine enabled. Installed and inspected the Send To shortcut (targets `powershell` → launcher). App bundle unchanged at ~3.49 MB (the payload slot is a few bytes). Not released — it's a local convenience; if a future release ships, the harmless slot hook rides along.
+
+### Portability to other machines (same day)
+
+The first cut hard-coded the app path (`..\..\dist`), so the launcher only worked inside the repo. Made `Open-Markdown.ps1` resolve the app from two candidates — next to itself first (portable), then the repo `dist/` (in-repo dev) — so one script serves both layouts. Added `Build-Package.ps1`, which assembles a self-contained folder/zip (app + launcher + installer + a recipient `PORTABLE-README.md`), plus an "install on another machine" section in the integration README. `dist-package/` is gitignored (rebuildable artifact).
+
+- **Audience: technical users / Brad's own machines.** So the instructions are copy-paste PowerShell (`-ExecutionPolicy Bypass -File Install-SendTo.ps1`), not a foolproof double-click flow.
+- **Verified the portable layout** by copying the package *outside* the repo and running the launcher there — where the `..\..\dist` fallback resolves to a nonexistent path, so success proves it used the co-located app. It did, and injected the payload.
+- **Deliberately not targeted at non-technical email recipients.** Bundling install scripts trips SmartScreen / AV / execution-policy and undermines the "inert, obviously-safe single file" appeal. For them, opening the HTML and dragging files in stays the better default.
