@@ -249,3 +249,33 @@ The first cut hard-coded the app path (`..\..\dist`), so the launcher only worke
 - **Audience: technical users / Brad's own machines.** So the instructions are copy-paste PowerShell (`-ExecutionPolicy Bypass -File Install-SendTo.ps1`), not a foolproof double-click flow.
 - **Verified the portable layout** by copying the package *outside* the repo and running the launcher there — where the `..\..\dist` fallback resolves to a nonexistent path, so success proves it used the co-located app. It did, and injected the payload.
 - **Deliberately not targeted at non-technical email recipients.** Bundling install scripts trips SmartScreen / AV / execution-policy and undermines the "inert, obviously-safe single file" appeal. For them, opening the HTML and dragging files in stays the better default.
+
+## 2026-06-22 — Drag-and-drop choked on large files (the picker didn't)
+
+Real-world signal: dragging a large `.md` onto the drop zone failed, but loading the *same* file through the click-to-browse picker worked. Classic "same destination, different on-ramp" bug.
+
+### Root cause
+
+Both on-ramps funnel into the same downstream pipeline (`addFiles` → `readFileAsText` → render), so the renderer was never the problem — the picker proved that by handling the same file fine. The divergence was purely in *how each path obtains the `File` object*:
+
+- **Picker** → `File` straight from `input.files`. Fully backed by disk, reads at any size.
+- **Drop** → went through the FileSystem entries API: `webkitGetAsEntry()` → `entryToFile()` → `FileSystemFileEntry.file(cb)`.
+
+That last call is **asynchronous**, but the `DataTransferItemList` it derives from is released the instant the `drop` handler returns. The browser has to snapshot the file to satisfy the callback. Small files snapshot before the list is released and win the race; large files lose it — the callback never fires (silent hang) or errors into `entryToFile`'s swallow-to-`null`, which then gets filtered out and surfaces as a generic error. Either way, size-correlated choke.
+
+### Fix
+
+The entries API is only genuinely needed to **detect and traverse folders**. For plain files, `DataTransferItem.getAsFile()` returns the same fully-backed `File` the picker yields — **synchronously**, no snapshot race. So `ingestDataTransfer` now captures, in the one synchronous pass it already had:
+
+- directory entries (via `webkitGetAsEntry().isDirectory`) → folder traversal as before;
+- everything else → `item.getAsFile()` directly.
+
+Plain single/multi-file drops — the 99% case, and the one that was breaking — no longer touch the async snapshot at all.
+
+### Known residual (intentional, not fixed)
+
+Files nested *inside a dropped folder* still come through `entry.file()` — directory-reader results have no synchronous `getAsFile()` equivalent. So a folder containing a huge file could still be fragile. Rare enough that I left it rather than bolt on a speculative timeout; logged here so the next person doesn't think drop-large-file is fully solved across the board.
+
+### Verified
+
+Brad re-dragged the previously-choking large file onto the rebuilt `dist/` artifact — renders now. Picker path unchanged. `dist/markdown-reticulator.html` rebuilt at ~3492.5 KB (logic-only change, size unmoved). Not released — `main` was already ahead of v1.2.0; bundle into the next release if/when one is cut.

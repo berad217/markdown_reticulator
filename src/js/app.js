@@ -154,20 +154,32 @@ function ingestDataTransfer(dataTransfer) {
         return;
     }
 
-    // webkitGetAsEntry must be called synchronously — the items list is cleared
-    // once this handler returns, but the entry objects stay valid afterward.
-    const entries = [];
+    // Capture both synchronously — the items list is cleared once this handler
+    // returns. For plain files we take getAsFile() directly (the same fully
+    // backed File the picker yields); the entries API is used ONLY to detect and
+    // traverse folders. Earlier we read every dropped file via the async
+    // FileSystemFileEntry.file() snapshot, which races the item-list release and
+    // hangs/fails on large files — getAsFile() is synchronous and has no such race.
+    const directFiles = [];
+    const dirEntries = [];
     for (let i = 0; i < items.length; i++) {
-        const entry = items[i].webkitGetAsEntry();
-        if (entry) entries.push(entry);
+        const item = items[i];
+        const entry = item.webkitGetAsEntry();
+        if (entry && entry.isDirectory) {
+            dirEntries.push(entry);
+        } else {
+            const file = item.getAsFile();
+            if (file) directFiles.push(file);
+        }
     }
-    if (!entries.length) {
-        addFiles(Array.from(dataTransfer.files || []));
+
+    if (!dirEntries.length) {
+        addFiles(directFiles);
         return;
     }
 
-    collectFilesFromEntries(entries)
-        .then((files) => addFiles(files))
+    collectFilesFromEntries(dirEntries)
+        .then((files) => addFiles(directFiles.concat(files)))
         .catch((err) => {
             console.error('Folder read error:', err);
             showStatus(getRandomReference('errorMessages'), 'error');
