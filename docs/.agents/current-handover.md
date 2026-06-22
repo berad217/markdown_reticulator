@@ -1,13 +1,15 @@
 # Handover — markdown_reticulator
 
 ## Orientation
-Oriented via [`onboarding.md`](../../onboarding.md). Maintenance phase, solo dev. Read the latest [`docs/DEVLOG.md`](../DEVLOG.md) entries for current state. This handover is intentionally short — the work landed in files + a release, so there's little ephemeral delta.
+Oriented via [`onboarding.md`](../../onboarding.md). Maintenance phase, solo dev. Read the latest [`docs/DEVLOG.md`](../DEVLOG.md) entries for current state. Short by design — work lands in files + releases, so there's little ephemeral delta.
 
 ## The Delta (not in the files)
-- **Clean slate, nothing in flight.** `main` is ahead of the last release: **v1.2.0 "The Fellowship of the Files"** shipped the multi-file sidebar. Since then `main` also carries the Windows "Send To" launcher (`integrations/windows/`) and its portable packager — committed, working, not yet in any release. Nothing broken or mid-edit.
-- **`gh` CLI works in this environment** — the project docs assume it doesn't. Verify release state with `gh release list` before trusting a DEVLOG "still ahead" note; one was stale earlier this session (claimed v1.1.0 was uncut when it had already shipped Mermaid).
-- **Known minor limitation, intentional:** file reads are async, so dropping a second batch of files before the first finishes could race the first-file auto-select. Fine for normal "drop a folder once" use.
+- **Truly clean — nothing ahead, nothing in flight.** As of 2026-06-22, `main` (`e400800`) *is* the latest release: **v1.2.1 "The Two Towers of Text"** (the drag-and-drop large-file fix). Unlike the last several sessions, `main` is **not** sitting ahead of a tag — the previously-unreleased Send To launcher work got swept into v1.2.1. Nothing broken, nothing mid-edit. That "nothing's pending" state is the point of this note: don't go hunting for an in-flight delta that isn't there.
+- **`gh` CLI works in this environment** — the project docs assume it doesn't. Verified again this session (pushed and cut the release with it). Trust `gh release list` over any DEVLOG "still ahead" line; those go stale.
+- **Two known, intentional limitations (not bugs to chase):**
+  - Files nested *inside a dropped folder* still read via the async `entry.file()` path, so a folder containing one enormous file could still choke. Dropping the big file directly, or click-to-browse, sidesteps it. Left alone deliberately — see the 2026-06-22 DEVLOG entry.
+  - Dropping a second batch of files before the first finishes could race the first-file auto-select. Fine for normal "drop once" use.
 
 ## Next Steps
 1. Nothing required — await a real-world usage signal (project ethos: no speculative polish).
-2. If/when worth it: optional polish is in the DEVLOG "Still ahead" (drag-to-reorder, persist the loaded set, per-file Save .md). The Send To launcher is a local convenience and isn't in a GitHub release — only bundle it into one if there's a reason to.
+2. Optional polish lives in the DEVLOG "Still ahead" notes (drag-to-reorder, persist the loaded set, per-file Save .md). Pull one in only if a real need shows up.
